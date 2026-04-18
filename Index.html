@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✨ Something special</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    font-family:'Segoe UI', Arial;
+    background: radial-gradient(circle at top,#0f0610,#000);
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+}
+
+/* INTRO */
+.intro{
+    position:fixed;
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#000;
+    color:#ffb6d9;
+    font-size:1.4rem;
+    z-index:100;
+    cursor:pointer;
+    animation:pulse 1.5s infinite;
+}
+@keyframes pulse{
+    0%,100%{opacity:1}
+    50%{opacity:.4}
+}
+
+/* CARD */
+.card{
+    width:340px;
+    padding:22px;
+    border-radius:28px;
+    background:rgba(20,10,25,0.92);
+    backdrop-filter:blur(12px);
+    text-align:center;
+    display:none;
+    box-shadow:0 0 60px rgba(255,80,150,0.12);
+}
+
+.card img{
+    width:100%;
+    border-radius:18px;
+    margin:12px 0;
+}
+
+button{
+    padding:10px 25px;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(45deg,#ff4d6d,#ff8fb3);
+    color:white;
+    cursor:pointer;
+    position:relative;
+}
+
+/* TIMER */
+.circle-timer{
+    width:75px;
+    height:75px;
+    border-radius:50%;
+    border:4px solid #ff4d6d;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:10px auto;
+    font-size:22px;
+    color:#ff4d6d;
+    box-shadow:0 0 15px rgba(255,70,120,0.5);
+}
+
+/* 💬 BUBBLES */
+.bubble{
+    position:absolute;
+    width:10px;
+    height:10px;
+    background:rgba(255,255,255,0.4);
+    border-radius:50%;
+    animation:float 3s linear forwards;
+    pointer-events:none;
+    z-index:5;
+}
+@keyframes float{
+    from{transform:translateY(0);opacity:1;}
+    to{transform:translateY(-200px);opacity:0;}
+}
+
+/* ❤️ HEART RAIN */
+.heart{
+    position:absolute;
+    top:-10vh;
+    font-size:16px;
+    opacity:0.5;
+    animation:fall linear forwards;
+    pointer-events:none;
+    z-index:2;
+}
+@keyframes fall{
+    to{
+        transform:translateY(120vh);
+        opacity:0;
+    }
+}
+
+/* 💀 JUMPSCARE */
+.jumpscare{
+    position:fixed;
+    top:0;left:0;
+    width:100%;
+    height:100%;
+    background:black;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:200;
+}
+
+.jumpscare img{
+    width:90%;
+    max-width:380px;
+    border-radius:20px;
+    box-shadow:0 0 80px red;
+}
+
+.jumpscare p{
+    color:#ff4d6d;
+    margin-top:15px;
+    font-size:22px;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" src="pppp.mp3" loop></audio>
+
+<div class="intro" onclick="start()">✨ something special for you 👀</div>
+
+<div id="app" class="card"></div>
+
+<script>
+
+/* =========================
+   🔥 EDIT HERE
+   ========================= */
+
+const pics=["bress.jpg","gng.jpg","mimi.jpg"];
+
+const jumpPics=[
+"pipi.jpg",   // jumpscare 1
+"cress.jpg"   // jumpscare 2
+];
+
+/* ========================= */
+
+let step=0;
+let locked=false;
+let btnRef=null;
+let fakeClicks=0;
+
+/* START */
+function start(){
+document.querySelector(".intro").style.display="none";
+app.style.display="block";
+
+let music=document.getElementById("bgMusic");
+music.volume=0.25;
+music.play();
+
+heartRain();
+next();
+}
+
+/* ❤️ HEART RAIN */
+function heartRain(){
+setInterval(()=>{
+    let h=document.createElement("div");
+    h.className="heart";
+    h.innerText="❤";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=(12+Math.random()*10)+"px";
+    h.style.animationDuration=(3+Math.random()*3)+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),6000);
+},300);
+}
+
+/* 💬 BUBBLE */
+function spawnBubble(x,y){
+let b=document.createElement("div");
+b.className="bubble";
+b.style.left=x+"px";
+b.style.top=y+"px";
+document.body.appendChild(b);
+setTimeout(()=>b.remove(),3000);
+}
+
+/* 💀 JUMPSCARE */
+function jumpscare(img,text,cb){
+locked=true;
+
+let j=document.createElement("div");
+j.className="jumpscare";
+
+j.innerHTML=`
+<img src="${img}">
+<p>${text}</p>
+`;
+
+document.body.appendChild(j);
+
+setTimeout(()=>{
+j.remove();
+locked=false;
+cb();
+},1500);
+}
+
+/* 🎮 FLOW */
+function next(){
+if(locked)return;
+step++;
+
+if(step==1){
+app.innerHTML=`
+<p>Hey… don’t rush 👀</p>
+<img src="${pics[0]}">
+<button onclick="next()">Next</button>`;
+}
+
+else if(step==2){
+app.innerHTML=`
+<p>Slow… 😏</p>
+<img src="${pics[1]}">
+<button onclick="next()">Next</button>`;
+}
+
+else if(step==3){
+app.innerHTML=`
+<p>Look closely… 😶</p>
+<img src="${pics[2]}">
+<button onclick="jumpscare(jumpPics[0],'😈',next)">Next</button>`;
+}
+
+else if(step==4){
+app.innerHTML=`
+<p>👀 don’t click too fast</p>
+<button id="btn">Next</button>
+`;
+btnRef=document.getElementById("btn");
+fakeClicks=0;
+
+btnRef.addEventListener("click",()=>{
+fakeClicks++;
+
+spawnBubble(Math.random()*300,Math.random()*500);
+
+btnRef.style.left=Math.random()*200+"px";
+btnRef.style.position="relative";
+
+if(fakeClicks>=3){
+btnRef.onclick=()=>jumpscare(jumpPics[1],"Aaj kaunse colour ki pehni hai ji 👀",finalScreen);
+}
+});
+}
+}
+
+/* FINAL */
+function finalScreen(){
+app.innerHTML=`
+<p>😼 game over</p>
+<button onclick="location.reload()">Restart</button>
+`;
+}
+
+</script>
+
+</body>
+</html>
